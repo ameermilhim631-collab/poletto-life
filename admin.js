@@ -99,19 +99,19 @@ function handleLogin(e) {
     const password = document.getElementById('password').value;
 
     const users = JSON.parse(localStorage.getItem('poletto_admin_users') || '[]');
-    const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
+    const user = users.find(u => u.username === username && u.password === password);
 
     if (user) {
         if (user.status === 'inactive') {
             showToast('هذا الحساب معطل', 'error');
             return;
         }
-
+        
         localStorage.setItem('poletto_current_admin', JSON.stringify(user));
         showDashboard();
         showToast('مرحباً ' + user.username + '!', 'success');
     } else {
-        showToast('اسم المستخدم أو البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+        showToast('اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
     }
 }
 

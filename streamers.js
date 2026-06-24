@@ -458,16 +458,11 @@ function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-
-    // Check admin users first
+    
     const adminUsers = JSON.parse(localStorage.getItem('poletto_admin_users') || '[]');
     const adminUser = adminUsers.find(u => u.email === email && u.password === password);
-
+    
     if (adminUser) {
-        if (adminUser.status === 'inactive') {
-            showToast('هذا الحساب معطل', 'error');
-            return;
-        }
         loginUser({
             name: adminUser.username,
             email: adminUser.email,
@@ -480,58 +475,26 @@ function handleLogin(e) {
         checkAdminAccess();
         return;
     }
-
-    // Check registered users
-    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
-    const regUser = registeredUsers.find(u => u.email === email && u.password === password);
-
-    if (regUser) {
-        loginUser({
-            name: regUser.name,
-            email: regUser.email,
-            discord: regUser.discord,
-            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${regUser.email}&backgroundColor=b6e3f4`
-        });
-        closeModal('loginModal');
-        showToast(`مرحباً ${regUser.name}!`, 'success');
-        return;
-    }
-
-    showToast('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
+    
+    loginUser({
+        name: email.split('@')[0],
+        email: email,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=b6e3f4`
+    });
+    closeModal('loginModal');
+    showToast('تم تسجيل الدخول بنجاح!', 'success');
 }
 
 function handleRegister(e) {
     e.preventDefault();
-    const name = document.getElementById('registerName').value;
-    const email = document.getElementById('registerEmail').value;
-    const password = document.getElementById('registerPassword').value;
-    const discord = document.getElementById('registerDiscord').value;
-
-    // Check if email already exists
-    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
-    if (registeredUsers.find(u => u.email === email)) {
-        showToast('هذا البريد الإلكتروني مسجل بالفعل', 'error');
-        return;
-    }
-
-    const newUser = {
-        name: name,
-        email: email,
-        password: password,
-        discord: discord,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=b6e3f4`,
-        createdAt: new Date().toISOString()
+    const user = {
+        name: document.getElementById('registerName').value,
+        email: document.getElementById('registerEmail').value,
+        discord: document.getElementById('registerDiscord').value,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${document.getElementById('registerEmail').value}&backgroundColor=b6e3f4`
     };
-
-    registeredUsers.push(newUser);
-    localStorage.setItem('poletto_users', JSON.stringify(registeredUsers));
-
-    loginUser({
-        name: name,
-        email: email,
-        discord: discord,
-        avatar: newUser.avatar
-    });
+    
+    loginUser(user);
     closeModal('registerModal');
     showToast('تم إنشاء الحساب بنجاح!', 'success');
 }
