@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إعداد تسجيل الدخول بالديسكورد | بوليتو لايف</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #0a0a0f;
+            color: white;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #5865F2 0%, #00b4ff 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .header p {
+            color: #a0a0b0;
+            font-size: 1.1rem;
+        }
+        
+        .setup-card {
+            background: #1a1a25;
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 1px solid rgba(0, 180, 255, 0.1);
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #5865F2 0%, #00b4ff 100%);
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .setup-card h3 {
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+        
+        .setup-card p {
+            color: #a0a0b0;
+            line-height: 1.8;
+            margin-bottom: 15px;
+        }
+        
+        .code-block {
+            background: #0a0a0f;
+            border-radius: 10px;
+            padding: 15px 20px;
+            font-family: 'Poppins', monospace;
+            font-size: 0.9rem;
+            color: #00b4ff;
+            overflow-x: auto;
+            margin-bottom: 15px;
+            direction: ltr;
+            text-align: left;
+            border: 1px solid rgba(0, 180, 255, 0.2);
+        }
+        
+        .highlight {
+            background: rgba(0, 180, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #00b4ff;
+        }
+        
+        .warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .warning h4 {
+            color: #f59e0b;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .warning p {
+            color: #a0a0b0;
+            font-size: 0.95rem;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 28px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            font-family: inherit;
+            font-size: 1rem;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #00b4ff 0%, #0066aa 100%);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 180, 255, 0.4);
+        }
+        
+        .btn-discord {
+            background: #5865F2;
+            color: white;
+        }
+        
+        .btn-discord:hover {
+            background: #4752C4;
+            transform: translateY(-2px);
+        }
+        
+        .buttons-row {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        .back-link {
+            color: #a0a0b0;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 30px;
+            transition: color 0.3s;
+        }
+        
+        .back-link:hover {
+            color: #00b4ff;
+        }
+        
+        ol, ul {
+            padding-right: 25px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            color: #a0a0b0;
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        strong {
+            color: white;
+        }
+        
+        .file-info {
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .file-info h4 {
+            color: #10b981;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 1.8rem;
+            }
+            
+            .buttons-row {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fab fa-discord"></i> إعداد تسجيل الدخول بالديسكورد</h1>
+            <p>اتبع الخطوات التالية لتفعيل تسجيل الدخول بالديسكورد في متجرك</p>
+        </div>
+        
+        <div class="setup-card">
+            <div class="step-number">1</div>
+            <h3>إنشاء تطبيق ديسكورد</h3>
+            <p>اذهب إلى Discord Developer Portal وأنشئ تطبيقاً جديداً:</p>
+            <ol>
+                <li>اذهب إلى <a href="https://discord.com/developers/applications" target="_blank" style="color: #00b4ff;">Discord Developer Portal</a></li>
+                <li>اضغط <strong>"New Application"</strong> في الزاوية العلوية اليمنى</li>
+                <li>أدخل اسم للتطبيق (مثل: Poletto Life Store)</li>
+                <li>اضغط <strong>"Create"</strong></li>
+            </ol>
+        </div>
+        
+        <div class="setup-card">
+            <div class="step-number">2</div>
+            <h3>الحصول على Client ID</h3>
+            <p>بعد إنشاء التطبيق، احصل على Client ID:</p>
+            <ol>
+                <li>من القائمة الجانبية، اذهب إلى <strong>"OAuth2"</strong></li>
+                <li>اضغط على <strong>"General"</strong></li>
+                <li>انسخ قيمة <strong>"Client ID"</strong></li>
+            </ol>
+            <div class="code-block">
+                Client ID: 123456789012345678
+            </div>
+        </div>
+        
+        <div class="setup-card">
+            <div class="step-number">3</div>
+            <h3>إضافة Redirect URI</h3>
+            <p>أضف رابط إعادة التوجيه الخاص بموقعك:</p>
+            <ol>
+                <li>من نفس صفحة OAuth2، اذهب إلى <strong>"Redirects"</strong></li>
+                <li>اضغط <strong>"Add Redirect"</strong></li>
+                <li>أضف الرابط التالي (استبدل YOUR_DOMAIN بنطاق موقعك):</li>
+            </ol>
+            <div class="code-block">
+                https://YOUR_DOMAIN/auth-callback.html
+            </div>
+            
+            <div class="warning">
+                <h4><i class="fas fa-exclamation-triangle"></i> ملاحظة مهمة</h4>
+                <p>إذا كنت تختبر الموقع محلياً، أضف أيضاً:</p>
+                <div class="code-block" style="margin-top: 10px;">
+                    http://localhost/auth-callback.html
+                </div>
+            </div>
+        </div>
+        
+        <div class="setup-card">
+            <div class="step-number">4</div>
+            <h3>تحديث الكود</h3>
+            <p>افتح ملف <span class="highlight">streamers.js</span> وعدّل القيمة التالية:</p>
+            <div class="code-block">
+// في ملف streamers.js<br>
+const DISCORD_CONFIG = {<br>
+&nbsp;&nbsp;clientId: 'ضع_هنا_Client_ID_الخاصة_bik',<br>
+&nbsp;&nbsp;redirectUri: window.location.origin + '/auth-callback.html',<br>
+&nbsp;&nbsp;scope: 'identify email'<br>
+};
+            </div>
+            
+            <div class="file-info">
+                <h4><i class="fas fa-info-circle"></i> لا تنسَ</h4>
+                <p>عدّل أيضاً في ملف <strong>script.js</strong> نفس القيمة في دالة <strong>loginWithDiscord</strong></p>
+            </div>
+        </div>
+        
+        <div class="setup-card">
+            <div class="step-number">5</div>
+            <h3>اختبار التسجيل</h3>
+            <p>بعد إتمام الخطوات السابقة:</p>
+            <ol>
+                <li>افتح المتجر في المتصفح</li>
+                <li>اضغط "تسجيل دخول"</li>
+                <li>اضغط "الدخول بحساب الديسكورد"</li>
+                <li>سيتم تحويلك إلى ديسكورد للمصادقة</li>
+                <li>بعد الموافقة، ستعود للمتجر وستكون مسجلاً دخولك</li>
+            </ol>
+        </div>
+        
+        <div class="warning">
+            <h4><i class="fas fa-shield-alt"></i> الأمان</h4>
+            <p>لا تشارك Client Secret مع أي شخص. إذا انسرق، أعد إنشاء سر جديد من صفحة OAuth2 → Reset Secret.</p>
+        </div>
+        
+        <div class="buttons-row">
+            <a href="https://discord.com/developers/applications" target="_blank" class="btn btn-discord">
+                <i class="fab fa-discord"></i>
+                فتح Discord Developer Portal
+            </a>
+            <a href="index.html" class="btn btn-primary">
+                <i class="fas fa-store"></i>
+                العودة للمتجر
+            </a>
+        </div>
+        
+        <a href="index.html" class="back-link">
+            <i class="fas fa-arrow-right"></i>
+            العودة للمتجر
+        </a>
+    </div>
+</body>
+</html>

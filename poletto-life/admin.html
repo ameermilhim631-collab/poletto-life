@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم | بوليتو لايف</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="login-page">
+        <div class="login-container">
+            <div class="login-box">
+                <div class="login-header">
+                    <div class="login-logo">PL</div>
+                    <h1>لوحة التحكم</h1>
+                    <p>سجّل دخولك للإدارة</p>
+                </div>
+                <form id="loginForm" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="username">
+                            <i class="fas fa-user"></i>
+                            اسم المستخدم
+                        </label>
+                        <input type="text" id="username" placeholder="admin" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">
+                            <i class="fas fa-lock"></i>
+                            كلمة المرور
+                        </label>
+                        <div class="password-input">
+                            <input type="password" id="password" placeholder="••••••••" required>
+                            <button type="button" class="toggle-password" onclick="togglePassword()">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-options">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="rememberMe">
+                            <span>تذكرني</span>
+                        </label>
+                    </div>
+                    <button type="submit" class="login-btn">
+                        <i class="fas fa-sign-in-alt"></i>
+                        تسجيل الدخول
+                    </button>
+                </form>
+                <div class="login-footer">
+                    <a href="index.html"><i class="fas fa-arrow-right"></i> العودة للمتجر</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="admin-dashboard hidden">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="sidebar-logo">PL</div>
+                <span class="sidebar-title">لوحة التحكم</span>
+            </div>
+            <nav class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-home"></i>
+                    <span>الرئيسية</span>
+                </a>
+                <a href="#" class="nav-item" data-section="products">
+                    <i class="fas fa-box"></i>
+                    <span>المنتجات</span>
+                </a>
+                <a href="#" class="nav-item" data-section="orders">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span>الطلبات</span>
+                </a>
+                <a href="#" class="nav-item" data-section="users">
+                    <i class="fas fa-users"></i>
+                    <span>المستخدمين</span>
+                </a>
+                <a href="#" class="nav-item" data-section="streamers">
+                    <i class="fas fa-video"></i>
+                    <span>صناع المحتوى</span>
+                </a>
+                <a href="#" class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i>
+                    <span>الإعدادات</span>
+                </a>
+                <a href="index.html" class="nav-item" target="_blank">
+                    <i class="fas fa-store"></i>
+                    <span>عرض المتجر</span>
+                </a>
+            </nav>
+            <div class="sidebar-footer">
+                <div class="admin-info">
+                    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=admin" alt="admin" class="admin-avatar">
+                    <div class="admin-details">
+                        <span class="admin-name" id="currentAdminName">Owner</span>
+                        <span class="admin-role">المدير</span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="handleLogout()">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="content-header">
+                <button class="sidebar-toggle" onclick="toggleSidebar()">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h2 id="pageTitle">لوحة التحكم</h2>
+                <div class="header-actions">
+                    <button class="view-store-btn" onclick="window.open('index.html', '_blank')">
+                        <i class="fas fa-external-link-alt"></i>
+                        عرض المتجر
+                    </button>
+                </div>
+            </header>
+
+            <!-- Dashboard Section -->
+            <section id="dashboardSection" class="content-section active">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-box"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalProducts">0</span>
+                            <span class="stat-label">المنتجات</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalOrders">0</span>
+                            <span class="stat-label">الطلبات</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalRevenue">$0</span>
+                            <span class="stat-label">الإيرادات</span>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-info">
+                            <span class="stat-value" id="totalUsers">1</span>
+                            <span class="stat-label">المستخدمين</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="dashboard-grid">
+                    <div class="dashboard-card recent-orders">
+                        <div class="card-header">
+                            <h3>آخر الطلبات</h3>
+                            <a href="#" class="view-all" onclick="showSection('orders')">عرض الكل</a>
+                        </div>
+                        <div class="orders-list" id="recentOrdersList">
+                            <div class="empty-state">
+                                <i class="fas fa-inbox"></i>
+                                <p>لا توجد طلبات بعد</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="dashboard-card quick-actions">
+                        <div class="card-header">
+                            <h3>إجراءات سريعة</h3>
+                        </div>
+                        <div class="actions-grid">
+                            <button class="action-btn" onclick="showSection('products'); openProductModal()">
+                                <i class="fas fa-plus"></i>
+                                <span>إضافة منتج</span>
+                            </button>
+                            <button class="action-btn" onclick="showSection('users'); openUserModal()">
+                                <i class="fas fa-user-plus"></i>
+                                <span>إضافة مستخدم</span>
+                            </button>
+                            <button class="action-btn" onclick="exportData()">
+                                <i class="fas fa-download"></i>
+                                <span>تصدير البيانات</span>
+                            </button>
+                            <button class="action-btn" onclick="window.open('index.html', '_blank')">
+                                <i class="fas fa-store"></i>
+                                <span>عرض المتجر</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Products Section -->
+            <section id="productsSection" class="content-section">
+                <div class="section-header-bar">
+                    <h3>إدارة المنتجات</h3>
+                    <button class="add-btn" onclick="openProductModal()">
+                        <i class="fas fa-plus"></i>
+                        إضافة منتج جديد
+                    </button>
+                </div>
+                <div class="products-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>اسم المنتج</th>
+                                <th>الفئة</th>
+                                <th>النوع</th>
+                                <th>السعر</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productsTableBody">
+                            <!-- Products will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="productsEmptyState">
+                        <i class="fas fa-box-open"></i>
+                        <p>لا توجد منتجات بعد</p>
+                        <button class="add-btn" onclick="openProductModal()">إضافة منتج جديد</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Orders Section -->
+            <section id="ordersSection" class="content-section">
+                <div class="section-header-bar">
+                    <h3>إدارة الطلبات</h3>
+                    <div class="filter-group">
+                        <select id="orderFilter" onchange="filterOrders()">
+                            <option value="all">جميع الطلبات</option>
+                            <option value="pending">قيد الانتظار</option>
+                            <option value="completed">مكتملة</option>
+                            <option value="cancelled">ملغاة</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="products-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>رقم الطلب</th>
+                                <th>المستخدم</th>
+                                <th>المنتج</th>
+                                <th>المبلغ</th>
+                                <th>طريقة الدفع</th>
+                                <th>التاريخ</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="ordersTableBody">
+                            <!-- Orders will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="ordersEmptyState">
+                        <i class="fas fa-inbox"></i>
+                        <p>لا توجد طلبات بعد</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Users Section -->
+            <section id="usersSection" class="content-section">
+                <div class="section-header-bar">
+                    <h3>إدارة المستخدمين والصلاحيات</h3>
+                    <button class="add-btn" onclick="openUserModal()">
+                        <i class="fas fa-user-plus"></i>
+                        إضافة مستخدم جديد
+                    </button>
+                </div>
+                <div class="products-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>اسم المستخدم</th>
+                                <th>البريد الإلكتروني</th>
+                                <th>الصلاحية</th>
+                                <th>تاريخ الإنشاء</th>
+                                <th>الحالة</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="usersTableBody">
+                            <!-- Users will be loaded here -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Streamers Section -->
+            <section id="streamersSection" class="content-section">
+                <div class="section-header-bar">
+                    <h3>إدارة صناع المحتوى</h3>
+                    <button class="add-btn" onclick="openStreamerModal()">
+                        <i class="fas fa-user-plus"></i>
+                        إضافة صانع محتوى
+                    </button>
+                </div>
+                <div class="products-table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>الصورة</th>
+                                <th>الاسم</th>
+                                <th>المستخدم</th>
+                                <th>المنصة</th>
+                                <th>المتابعون</th>
+                                <th>الحالة</th>
+                                <th>مميز</th>
+                                <th>الإجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="streamersTableBody">
+                            <!-- Streamers will be loaded here -->
+                        </tbody>
+                    </table>
+                    <div class="empty-state" id="streamersEmptyState">
+                        <i class="fas fa-video-slash"></i>
+                        <p>لا يوجد صناع محتوى بعد</p>
+                        <button class="add-btn" onclick="openStreamerModal()">إضافة صانع محتوى</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Settings Section -->
+            <section id="settingsSection" class="content-section">
+                <div class="settings-grid">
+                    <div class="settings-card">
+                        <h3><i class="fas fa-store"></i> إعدادات المتجر</h3>
+                        <form id="storeSettingsForm" onsubmit="saveStoreSettings(event)">
+                            <div class="form-group">
+                                <label>اسم المتجر</label>
+                                <input type="text" id="storeName" value="𝐏𝐨𝐥𝐞𝐭𝐭𝗼 𝗹𝗶𝗳 e ᶜᶠʷ">
+                            </div>
+                            <div class="form-group">
+                                <label>وصف المتجر</label>
+                                <textarea id="storeDescription" rows="3">أفضل سيرفر CFW للعب Roleplay</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label>رابط الديسكورد</label>
+                                <input type="url" id="discordLink" value="https://discord.gg/FRNyFAqv5">
+                            </div>
+                            <div class="form-group">
+                                <label>عنوان السيرفر</label>
+                                <input type="text" id="serverAddress" value="play.polettolife.com">
+                            </div>
+                            <button type="submit" class="save-btn">
+                                <i class="fas fa-save"></i>
+                                حفظ الإعدادات
+                            </button>
+                        </form>
+                    </div>
+                    <div class="settings-card">
+                        <h3><i class="fas fa-credit-card"></i> طرق الدفع</h3>
+                        <div class="payment-settings" id="paymentMethodsList">
+                            <!-- Payment methods will be loaded here -->
+                        </div>
+                        <button class="add-btn" style="margin-top: 15px; width: 100%;" onclick="openPaymentMethodModal()">
+                            <i class="fas fa-plus"></i>
+                            إضافة طريقة دفع جديدة
+                        </button>
+                    </div>
+                    <div class="settings-card">
+                        <h3><i class="fas fa-shield-alt"></i> الأمان</h3>
+                        <form id="passwordForm" onsubmit="changePassword(event)">
+                            <div class="form-group">
+                                <label>كلمة المرور الحالية</label>
+                                <input type="password" id="currentPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>كلمة المرور الجديدة</label>
+                                <input type="password" id="newPassword" required>
+                            </div>
+                            <div class="form-group">
+                                <label>تأكيد كلمة المرور</label>
+                                <input type="password" id="confirmPassword" required>
+                            </div>
+                            <button type="submit" class="save-btn">
+                                <i class="fas fa-key"></i>
+                                تغيير كلمة المرور
+                            </button>
+                        </form>
+                    </div>
+                    <div class="settings-card">
+                        <h3><i class="fab fa-discord"></i> إعداد الديسكورد</h3>
+                        <form id="discordForm" onsubmit="saveDiscordSettings(event)">
+                            <div class="form-group">
+                                <label>Client ID</label>
+                                <input type="text" id="discordClientId" placeholder="123456789012345678">
+                                <small style="color: var(--text-muted); font-size: 0.8rem;">احصل عليه من Discord Developer Portal</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Redirect URI</label>
+                                <input type="text" id="discordRedirectUri" placeholder="https://yourdomain.com/auth-callback.html">
+                            </div>
+                            <div class="form-group">
+                                <label>Discord Server Invite</label>
+                                <input type="url" id="discordInvite" value="https://discord.gg/FRNyFAqv5">
+                            </div>
+                            <button type="submit" class="save-btn">
+                                <i class="fas fa-save"></i>
+                                حفظ إعدادات الديسكورد
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="productModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="productModalTitle">إضافة منتج جديد</h3>
+                <button class="close-modal" onclick="closeModal('productModal')">&times;</button>
+            </div>
+            <form id="productForm" onsubmit="saveProduct(event)">
+                <input type="hidden" id="editProductId">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>اسم المنتج *</label>
+                            <input type="text" id="productName" required>
+                        </div>
+                        <div class="form-group">
+                            <label>السعر ($) *</label>
+                            <input type="number" id="productPrice" min="0" step="0.01" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>الفئة *</label>
+                            <select id="productCategory" required>
+                                <option value="">اختر الفئة</option>
+                                <option value="vehicles">مركبات</option>
+                                <option value="realestate">عقارات</option>
+                                <option value="business">مشاريع تجارية</option>
+                                <option value="packages">حزم</option>
+                                <option value="ranks">رتب</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>النوع الفرعي</label>
+                            <select id="productSubcategory">
+                                <option value="">اختر النوع</option>
+                                <option value="sport">رياضية</option>
+                                <option value="luxury">فاخرة</option>
+                                <option value="offroad">دفع رباعي</option>
+                                <option value="bike">دراجات</option>
+                                <option value="apartment">شقق</option>
+                                <option value="villa">فلل</option>
+                                <option value="mansion">قصور</option>
+                                <option value="shop">محلات</option>
+                                <option value="garage">معارض</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>الوصف *</label>
+                        <textarea id="productDescription" rows="3" required></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>المميزات (كل ميزة في سطر جديد)</label>
+                        <textarea id="productFeatures" rows="4" placeholder="سرعة عالية&#10;تصميم أنيق&#10;أداء مميز"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>صورة المنتج</label>
+                        <div class="image-upload" id="imageUpload">
+                            <input type="file" id="productImage" accept="image/*" onchange="handleImageUpload(event)">
+                            <div class="upload-placeholder" id="uploadPlaceholder">
+                                <i class="fas fa-cloud-upload-alt"></i>
+                                <p>اسحب الصورة هنا أو اضغط للرفع</p>
+                                <span>PNG, JPG, GIF (حد أقصى 5MB)</span>
+                            </div>
+                            <img id="imagePreview" class="image-preview hidden" alt="preview">
+                            <button type="button" class="remove-image hidden" id="removeImage" onclick="removeImage()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>رابط الصورة (بديل للرفع)</label>
+                        <input type="url" id="productImageUrl" placeholder="https://example.com/image.jpg">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>ال badge</label>
+                            <select id="productBadge">
+                                <option value="">بدون badge</option>
+                                <option value="hot">🔥 الأكثر مبيعاً</option>
+                                <option value="new">✨ جديد</option>
+                                <option value="sale">💰 تخفيض</option>
+                                <option value="premium">💎 فاخر</option>
+                                <option value="legendary">⭐ أسطوري</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>الحالة</label>
+                            <select id="productStatus">
+                                <option value="active">نشط</option>
+                                <option value="inactive">غير نشط</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" onclick="closeModal('productModal')">إلغاء</button>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        حفظ المنتج
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- User Modal -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="userModalTitle">إضافة مستخدم جديد</h3>
+                <button class="close-modal" onclick="closeModal('userModal')">&times;</button>
+            </div>
+            <form id="userForm" onsubmit="saveUser(event)">
+                <input type="hidden" id="editUserId">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>اسم المستخدم *</label>
+                        <input type="text" id="newUsername" required>
+                    </div>
+                    <div class="form-group">
+                        <label>البريد الإلكتروني *</label>
+                        <input type="email" id="newUserEmail" required>
+                    </div>
+                    <div class="form-group" id="passwordGroup">
+                        <label>كلمة المرور *</label>
+                        <input type="password" id="newUserPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>الصلاحية *</label>
+                        <select id="newUserRole" required>
+                            <option value="">اختر الصلاحية</option>
+                            <option value="admin">مدير (Full Access)</option>
+                            <option value="editor">محرر (تعديل المنتجات والطلبات)</option>
+                            <option value="viewer">مشاهد (عرض فقط)</option>
+                        </select>
+                    </div>
+                    <div class="permissions-section">
+                        <h4>الصلاحيات التفصيلية</h4>
+                        <div class="permissions-grid">
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="permProducts" checked>
+                                <span>إدارة المنتجات</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="permOrders" checked>
+                                <span>إدارة الطلبات</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="permUsers">
+                                <span>إدارة المستخدمين</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="permSettings">
+                                <span>الإعدادات</span>
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" id="permStore" checked>
+                                <span>عرض المتجر</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>الحالة</label>
+                        <select id="newUserStatus">
+                            <option value="active">نشط</option>
+                            <option value="inactive">غير نشط</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" onclick="closeModal('userModal')">إلغاء</button>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        حفظ المستخدم
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Payment Method Modal -->
+    <div id="paymentMethodModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="paymentModalTitle">إضافة طريقة دفع</h3>
+                <button class="close-modal" onclick="closeModal('paymentMethodModal')">&times;</button>
+            </div>
+            <form id="paymentMethodForm" onsubmit="savePaymentMethod(event)">
+                <input type="hidden" id="editPaymentMethodId">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>اسم طريقة الدفع *</label>
+                            <input type="text" id="paymentMethodName" placeholder="مثل: بطاقه ائتمان، PayPal، zain cash" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الأيقونة (FontAwesome class) *</label>
+                            <input type="text" id="paymentMethodIcon" placeholder="مثل: fa-credit-card, fa-paypal" required>
+                            <small style="color: var(--text-muted); font-size: 0.8rem;">مثل: fa-credit-card, fa-paypal, fa-wallet</small>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>اللون</label>
+                            <input type="color" id="paymentMethodColor" value="#00b4ff">
+                        </div>
+                        <div class="form-group">
+                            <label>الحالة</label>
+                            <select id="paymentMethodStatus">
+                                <option value="active">مفعل</option>
+                                <option value="inactive">معطل</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>البيانات / الحساب</label>
+                        <textarea id="paymentMethodDetails" rows="3" placeholder="أدخل بيانات الحساب مثل رقم الحساب، البريد الإلكتروني، إلخ..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>تعليمات الدفع (اختياري)</label>
+                        <textarea id="paymentMethodInstructions" rows="2" placeholder="تعليمات إضافية للمستخدم عند الدفع"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>ترتيب العرض</label>
+                        <input type="number" id="paymentMethodOrder" min="0" value="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" onclick="closeModal('paymentMethodModal')">إلغاء</button>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        حفظ طريقة الدفع
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Streamer Modal -->
+    <div id="streamerModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="streamerModalTitle">إضافة صانع محتوى جديد</h3>
+                <button class="close-modal" onclick="closeModal('streamerModal')">&times;</button>
+            </div>
+            <form id="streamerForm" onsubmit="saveStreamer(event)">
+                <input type="hidden" id="editStreamerId">
+                <div class="modal-body">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>اسم المستخدم *</label>
+                            <input type="text" id="streamerUsernameAdmin" placeholder="username" required>
+                        </div>
+                        <div class="form-group">
+                            <label>الاسم المعروض *</label>
+                            <input type="text" id="streamerDisplayNameAdmin" placeholder="الاسم اللي يظهر" required>
+                        </div>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>المنصة *</label>
+                            <select id="streamerPlatformAdmin" required>
+                                <option value="">اختر المنصة</option>
+                                <option value="twitch">Twitch</option>
+                                <option value="youtube">YouTube</option>
+                                <option value="kick">Kick</option>
+                                <option value="tiktok">TikTok</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>رابط الحساب *</label>
+                            <input type="url" id="streamerUrlAdmin" placeholder="https://twitch.tv/username" required>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>صورة البروفايل (رابط)</label>
+                        <input type="url" id="streamerAvatarAdmin" placeholder="https://example.com/avatar.jpg">
+                    </div>
+                    <div class="form-group">
+                        <label>الوصف</label>
+                        <textarea id="streamerBioAdmin" placeholder="نبذة عن صانع المحتوى..." rows="2"></textarea>
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>عدد المتابعين</label>
+                            <input type="number" id="streamerFollowersAdmin" min="0" value="0">
+                        </div>
+                        <div class="form-group">
+                            <label>الحالة</label>
+                            <select id="streamerStatusAdmin">
+                                <option value="false">أوفلاين</option>
+                                <option value="true">بث مباشر</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="checkbox-label">
+                            <input type="checkbox" id="streamerFeaturedAdmin">
+                            <span>صانع محتوى مميز (يظهر في الصفحة الرئيسية)</span>
+                        </label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="cancel-btn" onclick="closeModal('streamerModal')">إلغاء</button>
+                    <button type="submit" class="save-btn">
+                        <i class="fas fa-save"></i>
+                        حفظ صانع المحتوى
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteModal" class="modal">
+        <div class="modal-content modal-small">
+            <div class="modal-header">
+                <h3>تأكيد الحذف</h3>
+                <button class="close-modal" onclick="closeModal('deleteModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="delete-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <p id="deleteMessage">هل أنت متأكد من حذف هذا العنصر؟</p>
+            </div>
+            <div class="modal-footer">
+                <button class="cancel-btn" onclick="closeModal('deleteModal')">إلغاء</button>
+                <button class="delete-btn" id="confirmDeleteBtn">
+                    <i class="fas fa-trash"></i>
+                    حذف
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script src="admin.js"></script>
+</body>
+</html>
