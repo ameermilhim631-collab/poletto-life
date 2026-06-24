@@ -1,4 +1,13 @@
 // Admin Configuration
+const API_BASE = window.location.origin + '/api/streamers';
+
+async function apiCall(method, body) {
+    const opts = { method, headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(API_BASE, opts);
+    return res.json();
+}
+
 const ADMIN_CONFIG = {
     defaultAdmin: {
         username: 'owner',
@@ -99,19 +108,19 @@ function handleLogin(e) {
     const password = document.getElementById('password').value;
 
     const users = JSON.parse(localStorage.getItem('poletto_admin_users') || '[]');
-    const user = users.find(u => u.username === username && u.password === password);
+    const user = users.find(u => (u.username === username || u.email === username) && u.password === password);
 
     if (user) {
         if (user.status === 'inactive') {
             showToast('هذا الحساب معطل', 'error');
             return;
         }
-        
+
         localStorage.setItem('poletto_current_admin', JSON.stringify(user));
         showDashboard();
         showToast('مرحباً ' + user.username + '!', 'success');
     } else {
-        showToast('اسم المستخدم أو كلمة المرور غير صحيحة', 'error');
+        showToast('اسم المستخدم أو البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
     }
 }
 
@@ -920,14 +929,19 @@ function closeModal(modalId) {
 // Toast Notification
 function showToast(message, type = 'success') {
     const toast = document.getElementById('toast');
-    const icon = type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle';
+    const icons = {
+        success: 'fa-check-circle',
+        error: 'fa-exclamation-circle',
+        warning: 'fa-exclamation-triangle'
+    };
+    const icon = icons[type] || 'fa-exclamation-circle';
     
     toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
     toast.className = 'toast ' + type + ' show';
     
     setTimeout(() => {
         toast.classList.remove('show');
-    }, 3000);
+    }, 4000);
 }
 
 // Export Data
@@ -977,18 +991,27 @@ document.addEventListener('keydown', (e) => {
 });
 
 // Streamers Management
-function loadStreamersAdmin() {
-    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+async function loadStreamersAdmin() {
+    let streamers;
+    try {
+        streamers = await apiCall('GET');
+    } catch {
+        streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+    }
+    localStorage.setItem('poletto_streamers', JSON.stringify(streamers));
     const tbody = document.getElementById('streamersTableBody');
     const emptyState = document.getElementById('streamersEmptyState');
+    const banner = document.getElementById('streamerUploadBanner');
 
     if (streamers.length === 0) {
         tbody.innerHTML = '';
         emptyState.classList.remove('hidden');
+        if (banner) banner.style.display = 'none';
         return;
     }
 
     emptyState.classList.add('hidden');
+    if (banner) banner.style.display = 'flex';
     const platformIcons = {
         twitch: 'twitch',
         youtube: 'youtube',
@@ -1070,10 +1093,9 @@ function editStreamer(index) {
     openStreamerModal(index);
 }
 
-function saveStreamer(e) {
+async function saveStreamer(e) {
     e.preventDefault();
 
-    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
     const editId = document.getElementById('editStreamerId').value;
 
     const streamerData = {
@@ -1088,25 +1110,47 @@ function saveStreamer(e) {
         featured: document.getElementById('streamerFeaturedAdmin').checked
     };
 
-    if (editId !== '') {
-        const index = parseInt(editId);
-        streamers[index] = { ...streamers[index], ...streamerData };
-    } else {
-        streamerData.id = Date.now();
-        streamers.push(streamerData);
+    try {
+        if (editId !== '') {
+            await apiCall('PUT', { index: parseInt(editId), ...streamerData });
+        } else {
+            await apiCall('POST', streamerData);
+        }
+    } catch {
+        const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+        if (editId !== '') {
+            streamers[parseInt(editId)] = { ...streamers[parseInt(editId)], ...streamerData };
+        } else {
+            streamerData.id = Date.now();
+            streamers.push(streamerData);
+        }
+        localStorage.setItem('poletto_streamers', JSON.stringify(streamers));
     }
 
-    localStorage.setItem('poletto_streamers', JSON.stringify(streamers));
     closeModal('streamerModal');
     loadStreamersAdmin();
     showToast(editId ? 'تم تعديل صانع المحتوى' : 'تم إضافة صانع المحتوى', 'success');
 }
 
-function deleteStreamer(index) {
-    openDeleteModal('هل أنت متأكد من حذف هذا الصانع؟', () => {
-        const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
-        streamers.splice(index, 1);
-        localStorage.setItem('poletto_streamers', JSON.stringify(streamers));
+function downloadStreamersJSON(streamers) {
+    const blob = new Blob([JSON.stringify(streamers, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'streamers.json';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function deleteStreamer(index) {
+    openDeleteModal('هل أنت متأكد من حذف هذا الصانع؟', async () => {
+        try {
+            await apiCall('DELETE', { index });
+        } catch {
+            const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+            streamers.splice(index, 1);
+            localStorage.setItem('poletto_streamers', JSON.stringify(streamers));
+        }
         loadStreamersAdmin();
         showToast('تم حذف صانع المحتوى', 'success');
     });

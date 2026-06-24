@@ -14,89 +14,33 @@
 let DISCORD_CLIENT_ID = '';
 
 // Default Streamers Data
-const defaultStreamers = [
-    {
-        id: 1,
-        username: 'boltx',
-        displayName: 'BoltX',
-        platform: 'twitch',
-        url: 'https://twitch.tv/boltx',
-        avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/8a734da9-21b0-4c82-b451-0e3d76bc375c-profile_image-300x300.png',
-        banner: '',
-        bio: 'بثوث مباشرة من سيرفر بوليتو لايف - roleplay احترافي',
-        isLive: false,
-        followers: 45000,
-        featured: true
-    },
-    {
-        id: 2,
-        username: 'mansourko',
-        displayName: ' MansourKO',
-        platform: 'youtube',
-        url: 'https://youtube.com/@mansourko',
-        avatar: 'https://yt3.googleusercontent.com/ytc/AIdro_kJxVJhXQzQzQzQzQzQzQzQzQzQzQzQzQzQzQ=s300-c-k-c0x00ffffff-no-rj',
-        banner: '',
-        bio: 'محتوى CFW حصري - دليل وتعليم.roleplay',
-        isLive: true,
-        followers: 120000,
-        featured: true
-    },
-    {
-        id: 3,
-        username: 'hika',
-        displayName: 'Hika',
-        platform: 'kick',
-        url: 'https://kick.com/hika',
-        avatar: 'https://files.kick.com/images/avatars/a1b2c3d4/profile_300x300.jpg',
-        banner: '',
-        bio: 'بثوث مباشرة من السيرفر - اقوى اللحظات',
-        isLive: false,
-        followers: 28000,
-        featured: true
-    },
-    {
-        id: 4,
-        username: 'hmashri',
-        displayName: 'HMashri',
-        platform: 'twitch',
-        url: 'https://twitch.tv/hmashri',
-        avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/hmashri-profile_image-300x300.png',
-        banner: '',
-        bio: 'roleplay specialist - محتوى مميز وسخيف',
-        isLive: false,
-        followers: 35000,
-        featured: true
-    },
-    {
-        id: 5,
-        username: 'q0tb',
-        displayName: 'Q0TB',
-        platform: 'youtube',
-        url: 'https://youtube.com/@q0tb',
-        avatar: 'https://yt3.googleusercontent.com/ytc/AIdro_q0tb-profile.jpg',
-        banner: '',
-        bio: 'فيديوهات تعليمية وسخيفة من السيرفر',
-        isLive: false,
-        followers: 18000,
-        featured: false
-    },
-    {
-        id: 6,
-        username: '3mzone',
-        displayName: '3MZone',
-        platform: 'twitch',
-        url: 'https://twitch.tv/3mzone',
-        avatar: 'https://static-cdn.jtvnw.net/jtv_user_pictures/3mzone-profile_image-300x300.png',
-        banner: '',
-        bio: 'بثوث يومية - أكبر مجتمع roleplay عربي',
-        isLive: false,
-        followers: 52000,
-        featured: true
+const defaultStreamers = [];
+
+// Initialize default data
+function initializeDefaultData() {
+    if (!localStorage.getItem('poletto_admin_users')) {
+        localStorage.setItem('poletto_admin_users', JSON.stringify([{
+            username: 'owner',
+            password: 'pollitos4',
+            email: 'admin@polettolife.com',
+            role: 'admin',
+            permissions: { products: true, orders: true, users: true, settings: true, store: true }
+        }]));
     }
-];
+    if (!localStorage.getItem('poletto_users')) {
+        localStorage.setItem('poletto_users', JSON.stringify([]));
+    }
+}
 
 // Initialize
+// Fallback: force hide loader after 3 seconds
+setTimeout(() => {
+    const loader = document.getElementById('pageLoader');
+    if (loader) loader.classList.add('hidden');
+}, 3000);
+
 document.addEventListener('DOMContentLoaded', () => {
+    initializeDefaultData();
     // Hide page loader
     setTimeout(() => {
         const loader = document.getElementById('pageLoader');
@@ -149,11 +93,34 @@ function initializeStreamers() {
 
 // Load Streamers
 function loadStreamers() {
-    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
     const grid = document.getElementById('streamersGrid');
     const avatarCloud = document.getElementById('avatarCloud');
     const liveFrame = document.getElementById('liveFrame');
 
+    const apiBase = window.location.origin + '/api/streamers';
+    fetch(apiBase)
+        .then(r => r.json())
+        .then(streamers => {
+            displayStreamers(streamers, grid, avatarCloud, liveFrame);
+        })
+        .catch(() => {
+            fetch('streamers.json')
+                .then(r => r.json())
+                .then(streamers => {
+                    if (streamers.length === 0) {
+                        const local = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+                        if (local.length > 0) streamers = local;
+                    }
+                    displayStreamers(streamers, grid, avatarCloud, liveFrame);
+                })
+                .catch(() => {
+                    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+                    displayStreamers(streamers, grid, avatarCloud, liveFrame);
+                });
+        });
+}
+
+function displayStreamers(streamers, grid, avatarCloud, liveFrame) {
     // Filter live streamers only
     const liveStreamers = streamers.filter(s => s.isLive);
 
@@ -358,6 +325,9 @@ function addStreamer(e) {
     document.getElementById('addStreamerForm').reset();
     loadStreamers();
     showToast('تم إضافة صانع المحتوى بنجاح!', 'success');
+    setTimeout(() => {
+        showToast('⚠️ ارفع ملف streamers.json على السيرفر عشان الناس تشوف', 'warning');
+    }, 1500);
 }
 
 // Check Admin Access - فقط المدير (Owner) يقدر يشوف نموذج الإضافة
@@ -458,11 +428,16 @@ function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
+
+    // Check admin users first
     const adminUsers = JSON.parse(localStorage.getItem('poletto_admin_users') || '[]');
     const adminUser = adminUsers.find(u => u.email === email && u.password === password);
-    
+
     if (adminUser) {
+        if (adminUser.status === 'inactive') {
+            showToast('هذا الحساب معطل', 'error');
+            return;
+        }
         loginUser({
             name: adminUser.username,
             email: adminUser.email,
@@ -475,34 +450,69 @@ function handleLogin(e) {
         checkAdminAccess();
         return;
     }
-    
-    loginUser({
-        name: email.split('@')[0],
-        email: email,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=b6e3f4`
-    });
-    closeModal('loginModal');
-    showToast('تم تسجيل الدخول بنجاح!', 'success');
+
+    // Check registered users
+    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
+    const regUser = registeredUsers.find(u => u.email === email && u.password === password);
+
+    if (regUser) {
+        loginUser({
+            name: regUser.name,
+            email: regUser.email,
+            discord: regUser.discord,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${regUser.email}&backgroundColor=b6e3f4`
+        });
+        closeModal('loginModal');
+        showToast(`مرحباً ${regUser.name}!`, 'success');
+        return;
+    }
+
+    showToast('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
 }
 
 function handleRegister(e) {
     e.preventDefault();
-    const user = {
-        name: document.getElementById('registerName').value,
-        email: document.getElementById('registerEmail').value,
-        discord: document.getElementById('registerDiscord').value,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${document.getElementById('registerEmail').value}&backgroundColor=b6e3f4`
+    const name = document.getElementById('registerName').value;
+    const email = document.getElementById('registerEmail').value;
+    const password = document.getElementById('registerPassword').value;
+    const discord = document.getElementById('registerDiscord').value;
+
+    // Check if email already exists
+    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
+    if (registeredUsers.find(u => u.email === email)) {
+        showToast('هذا البريد الإلكتروني مسجل بالفعل', 'error');
+        return;
+    }
+
+    const newUser = {
+        name: name,
+        email: email,
+        password: password,
+        discord: discord,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}&backgroundColor=b6e3f4`,
+        createdAt: new Date().toISOString()
     };
-    
-    loginUser(user);
+
+    registeredUsers.push(newUser);
+    localStorage.setItem('poletto_users', JSON.stringify(registeredUsers));
+
+    loginUser({
+        name: name,
+        email: email,
+        discord: discord,
+        avatar: newUser.avatar
+    });
     closeModal('registerModal');
     showToast('تم إنشاء الحساب بنجاح!', 'success');
 }
 
 function loginUser(user) {
     localStorage.setItem('poletto_user', JSON.stringify(user));
+    if (user.isAdmin) {
+        localStorage.setItem('poletto_current_admin', JSON.stringify(user));
+    }
     updateUIForLoggedInUser(user);
-    
+
     // Check admin access after login
     setTimeout(() => {
         checkAdminAccess();
@@ -513,7 +523,7 @@ function logout() {
     localStorage.removeItem('poletto_user');
     localStorage.removeItem('poletto_current_admin');
     updateUIForLoggedOutUser();
-    
+
     // Hide admin sections
     const addSection = document.getElementById('addStreamerSection');
     const adminLink = document.getElementById('adminLink');

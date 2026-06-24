@@ -1,9 +1,19 @@
-// Page Loader
+// Page Loader - Hide after load or max 3 seconds
+function hideLoader() {
+    const loader = document.getElementById('pageLoader');
+    if (loader) loader.classList.add('hidden');
+}
+
 window.addEventListener('load', () => {
-    setTimeout(() => {
-        const loader = document.getElementById('pageLoader');
-        if (loader) loader.classList.add('hidden');
-    }, 1500);
+    setTimeout(hideLoader, 1500);
+});
+
+// Fallback: force hide after 3 seconds no matter what
+setTimeout(hideLoader, 3000);
+
+// Also hide on DOMContentLoaded as backup
+document.addEventListener('DOMContentLoaded', () => {
+    setTimeout(hideLoader, 2000);
 });
 
 // Page transition when clicking links
@@ -362,16 +372,47 @@ function handleLogin(e) {
     e.preventDefault();
     const email = document.getElementById('loginEmail').value;
     const password = document.getElementById('loginPassword').value;
-    
-    const user = {
-        name: email.split('@')[0],
-        email: email,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-    };
-    
-    loginUser(user);
-    closeModal('loginModal');
-    showToast('تم تسجيل الدخول بنجاح!', 'success');
+
+    // Check admin users first
+    const adminUsers = JSON.parse(localStorage.getItem('poletto_admin_users') || '[]');
+    const adminUser = adminUsers.find(u => u.email === email && u.password === password);
+
+    if (adminUser) {
+        if (adminUser.status === 'inactive') {
+            showToast('هذا الحساب معطل', 'error');
+            return;
+        }
+        const user = {
+            name: adminUser.username,
+            email: adminUser.email,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${adminUser.username}`,
+            isAdmin: true,
+            role: adminUser.role
+        };
+        loginUser(user);
+        closeModal('loginModal');
+        showToast(`مرحباً ${adminUser.username}!`, 'success');
+        return;
+    }
+
+    // Check registered users
+    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
+    const regUser = registeredUsers.find(u => u.email === email && u.password === password);
+
+    if (regUser) {
+        const user = {
+            name: regUser.name,
+            email: regUser.email,
+            discord: regUser.discord,
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${regUser.email}`
+        };
+        loginUser(user);
+        closeModal('loginModal');
+        showToast(`مرحباً ${regUser.name}!`, 'success');
+        return;
+    }
+
+    showToast('البريد الإلكتروني أو كلمة المرور غير صحيحة', 'error');
 }
 
 // Register handler
@@ -381,15 +422,32 @@ function handleRegister(e) {
     const email = document.getElementById('registerEmail').value;
     const password = document.getElementById('registerPassword').value;
     const discord = document.getElementById('registerDiscord').value;
-    
-    const user = {
+
+    // Check if email already exists
+    const registeredUsers = JSON.parse(localStorage.getItem('poletto_users') || '[]');
+    if (registeredUsers.find(u => u.email === email)) {
+        showToast('هذا البريد الإلكتروني مسجل بالفعل', 'error');
+        return;
+    }
+
+    const newUser = {
+        name: name,
+        email: email,
+        password: password,
+        discord: discord,
+        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+        createdAt: new Date().toISOString()
+    };
+
+    registeredUsers.push(newUser);
+    localStorage.setItem('poletto_users', JSON.stringify(registeredUsers));
+
+    loginUser({
         name: name,
         email: email,
         discord: discord,
-        avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`
-    };
-    
-    loginUser(user);
+        avatar: newUser.avatar
+    });
     closeModal('registerModal');
     showToast('تم إنشاء الحساب بنجاح!', 'success');
 }
@@ -420,13 +478,19 @@ function loginWithDiscord() {
 // Login user
 function loginUser(user) {
     localStorage.setItem('poletto_user', JSON.stringify(user));
+    if (user.isAdmin) {
+        localStorage.setItem('poletto_current_admin', JSON.stringify(user));
+    }
     updateUIForLoggedInUser(user);
+    checkAdminLink();
 }
 
 // Logout
 function logout() {
     localStorage.removeItem('poletto_user');
+    localStorage.removeItem('poletto_current_admin');
     updateUIForLoggedOutUser();
+    checkAdminLink();
     showToast('تم تسجيل الخروج', 'success');
 }
 
@@ -748,7 +812,30 @@ function renderStreamersPreview() {
     const container = document.getElementById('streamersPreviewGrid');
     if (!container) return;
 
-    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+    const apiBase = window.location.origin + '/api/streamers';
+    fetch(apiBase)
+        .then(r => r.json())
+        .then(streamers => {
+            renderStreamersPreviewData(streamers, container);
+        })
+        .catch(() => {
+            fetch('streamers.json')
+                .then(r => r.json())
+                .then(streamers => {
+                    if (streamers.length === 0) {
+                        const local = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+                        if (local.length > 0) streamers = local;
+                    }
+                    renderStreamersPreviewData(streamers, container);
+                })
+                .catch(() => {
+                    const streamers = JSON.parse(localStorage.getItem('poletto_streamers') || '[]');
+                    renderStreamersPreviewData(streamers, container);
+                });
+        });
+}
+
+function renderStreamersPreviewData(streamers, container) {
     const featured = streamers.filter(s => s.featured || s.isLive).slice(0, 4);
 
     if (featured.length === 0) {
@@ -804,8 +891,41 @@ function checkOAuthLogin() {
     }
 }
 
+// Initialize default data
+function initializeDefaultData() {
+    if (!localStorage.getItem('poletto_admin_users')) {
+        localStorage.setItem('poletto_admin_users', JSON.stringify([{
+            username: 'owner',
+            password: 'pollitos4',
+            email: 'admin@polettolife.com',
+            role: 'admin',
+            permissions: { products: true, orders: true, users: true, settings: true, store: true }
+        }]));
+    }
+    if (!localStorage.getItem('poletto_products')) {
+        localStorage.setItem('poletto_products', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('poletto_orders')) {
+        localStorage.setItem('poletto_orders', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('poletto_store_settings')) {
+        localStorage.setItem('poletto_store_settings', JSON.stringify({
+            storeName: 'Poletto Life',
+            discordLink: 'https://discord.gg/FRNyFAqv5',
+            serverAddress: 'play.polettolife.com'
+        }));
+    }
+    if (!localStorage.getItem('poletto_users')) {
+        localStorage.setItem('poletto_users', JSON.stringify([]));
+    }
+    if (!localStorage.getItem('poletto_streamers')) {
+        localStorage.setItem('poletto_streamers', JSON.stringify([]));
+    }
+}
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
+    initializeDefaultData();
     checkAuth();
     checkOAuthLogin();
     renderProductsToSection('vehicles', 'vehicles');
@@ -825,3 +945,165 @@ window.addEventListener('storage', () => {
     renderPackages();
     renderRanks();
 });
+
+// ============================================
+// PREMIUM ENHANCEMENTS - Interactive Effects
+// ============================================
+
+// Wait for DOM to be ready
+document.addEventListener('DOMContentLoaded', () => {
+
+// Cursor Glow Effect
+const cursorGlow = document.createElement('div');
+cursorGlow.className = 'cursor-glow';
+document.body.appendChild(cursorGlow);
+
+document.addEventListener('mousemove', (e) => {
+    cursorGlow.style.left = e.clientX + 'px';
+    cursorGlow.style.top = e.clientY + 'px';
+});
+
+// Hide cursor glow on mobile
+if ('ontouchstart' in window) {
+    cursorGlow.style.display = 'none';
+}
+
+// Scroll Progress Indicator
+const scrollProgress = document.createElement('div');
+scrollProgress.className = 'scroll-progress';
+document.body.appendChild(scrollProgress);
+
+window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = (scrollTop / docHeight) * 100;
+    scrollProgress.style.width = scrollPercent + '%';
+});
+
+// Scroll Reveal Animation
+const observerOptions = {
+    threshold: 0.1,
+    rootMargin: '0px 0px -50px 0px'
+};
+
+const scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            entry.target.classList.add('revealed');
+        }
+    });
+}, observerOptions);
+
+// Add scroll-reveal class to sections
+document.querySelectorAll('.products, .packages, .streamers-preview, .contact, .faq').forEach(section => {
+    section.classList.add('scroll-reveal');
+    scrollObserver.observe(section);
+});
+
+// 3D Tilt Effect on Product Cards
+document.querySelectorAll('.product-card').forEach(card => {
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 20;
+        const rotateY = (centerX - x) / 20;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
+    });
+    
+    card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+    });
+});
+
+// Copy Server IP with Animation
+function copyServerIP() {
+    const ip = document.getElementById('ipAddress').textContent;
+    const copyBtn = document.querySelector('.copy-btn');
+    
+    navigator.clipboard.writeText(ip).then(() => {
+        copyBtn.classList.add('copied');
+        showToast('تم نسخ عنوان السيرفر!', 'success');
+        
+        setTimeout(() => {
+            copyBtn.classList.remove('copied');
+        }, 2000);
+    }).catch(() => {
+        showToast('فشل نسخ العنوان', 'error');
+    });
+}
+
+// Enhanced Counter Animation with Easing
+function animateCounter(element, target, duration = 2000) {
+    const start = 0;
+    const startTime = performance.now();
+    
+    function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease out cubic
+        const easeOut = 1 - Math.pow(1 - progress, 3);
+        const current = Math.floor(easeOut * target);
+        
+        element.textContent = current.toLocaleString();
+        
+        if (progress < 1) {
+            requestAnimationFrame(update);
+        }
+    }
+    
+    requestAnimationFrame(update);
+}
+
+// Observe stats section for counter animation
+const statsObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+        if (entry.isIntersecting) {
+            const counters = entry.target.querySelectorAll('.stat-number');
+            counters.forEach(counter => {
+                const target = parseInt(counter.dataset.count);
+                animateCounter(counter, target);
+            });
+            statsObserver.unobserve(entry.target);
+        }
+    });
+}, { threshold: 0.5 });
+
+const heroStats = document.querySelector('.hero-stats');
+if (heroStats) {
+    statsObserver.observe(heroStats);
+}
+
+// Smooth Reveal for FAQ Items
+document.querySelectorAll('.faq-question').forEach(question => {
+    question.addEventListener('click', () => {
+        const item = question.parentElement;
+        const answer = item.querySelector('.faq-answer');
+        const icon = question.querySelector('i');
+        
+        // Close other items
+        document.querySelectorAll('.faq-item').forEach(otherItem => {
+            if (otherItem !== item) {
+                otherItem.classList.remove('active');
+                otherItem.querySelector('.faq-answer').style.maxHeight = '0';
+            }
+        });
+        
+        // Toggle current item
+        item.classList.toggle('active');
+        
+        if (item.classList.contains('active')) {
+            answer.style.maxHeight = answer.scrollHeight + 'px';
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            answer.style.maxHeight = '0';
+            icon.style.transform = 'rotate(0deg)';
+        }
+    });
+});
+
+}); // End DOMContentLoaded

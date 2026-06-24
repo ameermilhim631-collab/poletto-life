@@ -2157,3 +2157,596 @@ body {
         padding: 25px;
     }
 }
+
+/* ============================================
+   PREMIUM ENHANCEMENTS - Aurora UI + Gaming
+   ============================================ */
+
+/* Aurora Background Animation */
+.hero {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.hero::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: 
+        radial-gradient(ellipse at 20% 50%, rgba(0, 180, 255, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(139, 0, 255, 0.1) 0%, transparent 50%),
+        radial-gradient(ellipse at 40% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%);
+    animation: auroraMove 20s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes auroraMove {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    25% { transform: translate(5%, -5%) rotate(1deg); }
+    50% { transform: translate(-3%, 3%) rotate(-1deg); }
+    75% { transform: translate(3%, 2%) rotate(0.5deg); }
+}
+
+.hero-content {
+    position: relative;
+    z-index: 2;
+}
+
+/* Floating Particles Enhanced */
+.particle {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    background: var(--primary);
+    border-radius: 50%;
+    opacity: 0;
+    animation: particleFloat linear infinite;
+    box-shadow: 0 0 10px var(--primary), 0 0 20px var(--primary);
+}
+
+@keyframes particleFloat {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 0.8;
+        transform: translateY(90vh) scale(1);
+    }
+    90% {
+        opacity: 0.6;
+        transform: translateY(10vh) scale(0.8);
+    }
+    100% {
+        transform: translateY(-10vh) scale(0);
+        opacity: 0;
+    }
+}
+
+/* Hero Title Neon Glow */
+.hero-title .gradient-text {
+    text-shadow: 
+        0 0 10px rgba(0, 180, 255, 0.5),
+        0 0 20px rgba(0, 180, 255, 0.3),
+        0 0 40px rgba(0, 180, 255, 0.2),
+        0 0 80px rgba(0, 180, 255, 0.1);
+    animation: neonPulse 3s ease-in-out infinite;
+}
+
+@keyframes neonPulse {
+    0%, 100% { 
+        text-shadow: 
+            0 0 10px rgba(0, 180, 255, 0.5),
+            0 0 20px rgba(0, 180, 255, 0.3),
+            0 0 40px rgba(0, 180, 255, 0.2);
+    }
+    50% { 
+        text-shadow: 
+            0 0 20px rgba(0, 180, 255, 0.8),
+            0 0 40px rgba(0, 180, 255, 0.5),
+            0 0 80px rgba(0, 180, 255, 0.3),
+            0 0 120px rgba(0, 180, 255, 0.2);
+    }
+}
+
+/* 3D Card Tilt Effect */
+.product-card {
+    transform-style: preserve-3d;
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
+                box-shadow 0.4s ease;
+    perspective: 1000px;
+}
+
+.product-card:hover {
+    transform: translateY(-10px) rotateX(5deg) rotateY(-5deg);
+    box-shadow: 
+        0 25px 50px rgba(0, 180, 255, 0.2),
+        0 0 30px rgba(0, 180, 255, 0.1),
+        inset 0 0 30px rgba(0, 180, 255, 0.05);
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: inherit;
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.1) 0%, 
+        rgba(255, 255, 255, 0) 50%);
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+/* Glassmorphism Upgrade for Cards */
+.product-card {
+    background: rgba(18, 18, 26, 0.8);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 180, 255, 0.15);
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Neon Button Effect */
+.buy-btn, .pricing-btn {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.buy-btn::before, .pricing-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.buy-btn:hover::before, .pricing-btn:hover::before {
+    width: 300px;
+    height: 300px;
+}
+
+.buy-btn:hover, .pricing-btn:hover {
+    box-shadow: 
+        0 0 20px rgba(0, 180, 255, 0.5),
+        0 0 40px rgba(0, 180, 255, 0.3),
+        0 0 60px rgba(0, 180, 255, 0.2);
+    transform: translateY(-3px);
+}
+
+/* Scroll Reveal Animation */
+.scroll-reveal {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: all 0.8s cubic-bezier(0.5, 0, 0, 1);
+}
+
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* Hero Stats Counter Animation */
+.stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+}
+
+/* Live Status Indicator */
+.status-live {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.status-live::before {
+    content: '';
+    width: 10px;
+    height: 10px;
+    background: #22c55e;
+    border-radius: 50%;
+    animation: livePulse 2s infinite;
+}
+
+@keyframes livePulse {
+    0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+    }
+    50% { 
+        box-shadow: 0 0 0 10px rgba(34, 197, 94, 0);
+    }
+}
+
+/* Floating Discord Button Enhanced */
+.floating-discord {
+    background: linear-gradient(135deg, #5865F2, #4752C4);
+    box-shadow: 0 4px 20px rgba(88, 101, 242, 0.4);
+    transition: all 0.3s ease;
+}
+
+.floating-discord:hover {
+    transform: translateY(-5px) scale(1.1);
+    box-shadow: 
+        0 8px 30px rgba(88, 101, 242, 0.6),
+        0 0 40px rgba(88, 101, 242, 0.3);
+}
+
+/* Hero Badge Shimmer */
+.hero-badge {
+    position: relative;
+    overflow: hidden;
+}
+
+.hero-badge::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.2), 
+        transparent);
+    animation: shimmer 3s infinite;
+}
+
+@keyframes shimmer {
+    0% { left: -100%; }
+    100% { left: 100%; }
+}
+
+/* Pricing Card Featured Glow */
+.pricing-card.featured {
+    position: relative;
+    border: 2px solid rgba(0, 180, 255, 0.3);
+    animation: featuredGlow 3s ease-in-out infinite;
+}
+
+@keyframes featuredGlow {
+    0%, 100% { 
+        box-shadow: 0 0 20px rgba(0, 180, 255, 0.2);
+    }
+    50% { 
+        box-shadow: 
+            0 0 30px rgba(0, 180, 255, 0.4),
+            0 0 60px rgba(0, 180, 255, 0.2);
+    }
+}
+
+/* Smooth Scroll Progress Indicator */
+.scroll-progress {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 0%;
+    height: 3px;
+    background: var(--gradient);
+    z-index: 10001;
+    transition: width 0.1s;
+}
+
+/* Interactive Hover Glow on Nav Links */
+.nav-links a {
+    position: relative;
+    padding: 5px 0;
+}
+
+.nav-links a::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    width: 0;
+    height: 2px;
+    background: var(--primary);
+    transition: all 0.3s ease;
+    transform: translateX(-50%);
+    box-shadow: 0 0 10px var(--primary);
+}
+
+.nav-links a:hover::before {
+    width: 100%;
+}
+
+/* Section Divider Glow Line */
+.section-header::after {
+    content: '';
+    display: block;
+    width: 60px;
+    height: 3px;
+    background: var(--gradient);
+    margin: 15px auto 0;
+    border-radius: 2px;
+    box-shadow: 0 0 15px rgba(0, 180, 255, 0.5);
+}
+
+/* Hero CTA Buttons Enhanced */
+.btn-primary {
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.btn-primary::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(45deg, 
+        transparent, 
+        rgba(255, 255, 255, 0.1), 
+        transparent);
+    transform: rotate(45deg);
+    transition: all 0.5s ease;
+}
+
+.btn-primary:hover::after {
+    left: 100%;
+}
+
+/* Floating Discord Tooltip */
+.floating-discord .discord-tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: var(--dark-2);
+    color: white;
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 180, 255, 0.2);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.floating-discord:hover .discord-tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+}
+
+/* Enhanced Modal Animation */
+.modal {
+    animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Toast Notification Enhanced */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    padding: 15px 30px;
+    border-radius: 15px;
+    font-weight: 600;
+    z-index: 10002;
+    opacity: 0;
+    transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    backdrop-filter: blur(20px);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+}
+
+.toast.success {
+    background: rgba(34, 197, 94, 0.9);
+    box-shadow: 0 10px 40px rgba(34, 197, 94, 0.3);
+}
+
+.toast.error {
+    background: rgba(239, 68, 68, 0.9);
+    box-shadow: 0 10px 40px rgba(239, 68, 68, 0.3);
+}
+
+.toast.warning {
+    background: rgba(245, 158, 11, 0.95);
+    box-shadow: 0 10px 40px rgba(245, 158, 11, 0.3);
+}
+
+.upload-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    margin-bottom: 16px;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    border-radius: 10px;
+    color: #f59e0b;
+    font-size: 0.9rem;
+    line-height: 1.6;
+}
+
+.upload-banner i {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+}
+
+.upload-banner code {
+    background: rgba(245, 158, 11, 0.2);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+}
+
+.upload-banner small {
+    color: rgba(245, 158, 11, 0.7);
+    font-size: 0.8rem;
+}
+
+.upload-banner.success-banner {
+    background: rgba(34, 197, 94, 0.12);
+    border-color: rgba(34, 197, 94, 0.4);
+    color: #22c55e;
+}
+
+.upload-banner.success-banner i {
+    color: #22c55e;
+}
+
+/* Interactive Cursor Glow Effect */
+.cursor-glow {
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, 
+        rgba(0, 180, 255, 0.1) 0%, 
+        transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: opacity 0.3s ease;
+    mix-blend-mode: screen;
+}
+
+/* Streamers Preview Card Hover */
+.streamer-preview-card {
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.streamer-preview-card:hover {
+    transform: translateY(-10px) scale(1.02);
+    box-shadow: 0 20px 40px rgba(0, 180, 255, 0.2);
+}
+
+/* Server IP Copy Button Animation */
+.copy-btn {
+    transition: all 0.3s ease;
+}
+
+.copy-btn:active {
+    transform: scale(0.9);
+}
+
+.copy-btn.copied {
+    color: #22c55e !important;
+    animation: copiedPulse 0.5s ease;
+}
+
+@keyframes copiedPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.3); }
+    100% { transform: scale(1); }
+}
+
+/* FAQ Item Accordion */
+.faq-item {
+    border: 1px solid rgba(0, 180, 255, 0.1);
+    border-radius: 15px;
+    margin-bottom: 15px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    background: rgba(18, 18, 26, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.faq-item:hover {
+    border-color: rgba(0, 180, 255, 0.3);
+}
+
+.faq-item.active {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 180, 255, 0.1);
+}
+
+.faq-question {
+    padding: 20px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.faq-question:hover {
+    color: var(--primary);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    padding: 0 20px;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 300px;
+    padding: 0 20px 20px;
+}
+
+.faq-item.active .faq-question i {
+    transform: rotate(180deg);
+}
+
+/* Loading Spinner for Buttons */
+.btn-loading {
+    position: relative;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+.btn-loading::after {
+    content: '';
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    border: 2px solid transparent;
+    border-top-color: white;
+    border-radius: 50%;
+    animation: btnSpin 0.8s linear infinite;
+    top: 50%;
+    left: 50%;
+    margin: -10px 0 0 -10px;
+}
+
+@keyframes btnSpin {
+    to { transform: rotate(360deg); }
+}
